@@ -1,0 +1,9 @@
+add_library(QtCoreLite
+  QObject.cpp
+  QEventDispatcher.cpp
+  QTimer.cpp
+)
+target_include_directories(QtCoreLite
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
