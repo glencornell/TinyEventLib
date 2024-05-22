@@ -1,16 +1,17 @@
-#ifndef QOBJECT_H
-#define QOBJECT_H
+#pragma once
 
 #include <vector>
 #include <functional>
 #include <unordered_map>
 #include <algorithm>
-#include "Signal.hpp"
+#include "QSignal.hpp"
 #include "QEvent.hpp"
+
+class QAbstractEventDispatcher;
 
 class QObject {
 public:
-    QObject(QObject* parent = nullptr);
+    explicit QObject(QObject* parent = nullptr);
     virtual ~QObject();
 
     QObject* parent() const;
@@ -19,9 +20,13 @@ public:
 
     virtual bool event(QEvent* event);
 
-    static void connect(Signal<>& signal, Signal<>::SlotType slot);
+    static void connect(QSignal<>& signal, QSignal<>::SlotType slot);
     static void addObject(QObject* object);
     static void removeObject(QObject* object);
+
+    void installEventFilter(QObject* filter);
+    void removeEventFilter(QObject* filter);
+    bool eventFilter(QEvent* event);
 
 protected:
     void addChild(QObject* child);
@@ -30,8 +35,7 @@ protected:
 private:
     QObject* m_parent = nullptr;
     std::vector<QObject*> m_children;
+    std::vector<QObject*> m_eventFilters;
 };
 
 extern std::vector<QObject*> g_topLevelObjects;
-
-#endif // QOBJECT_H

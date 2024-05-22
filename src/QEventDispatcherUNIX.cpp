@@ -1,41 +1,41 @@
-#include "QEventDispatcher.hpp"
+#include "QEventDispatcherUNIX.hpp"
 #include "QTimer.hpp"
 #include "QSocketNotifier.hpp"
 #include "QObject.hpp"
 #include <algorithm>
 #include <poll.h>
 #include <chrono>
+#include <unistd.h>
+#include <sys/eventfd.h>
 
-QEventDispatcher* globalEventDispatcher = nullptr;
-
-QEventDispatcher::QEventDispatcher(QObject* parent)
-    : QObject(parent) {
+QEventDispatcherUNIX::QEventDispatcherUNIX(QObject* parent)
+    : QAbstractEventDispatcher(parent), m_interrupted(false) {
     if (globalEventDispatcher == nullptr) {
         globalEventDispatcher = this;
     }
 }
 
-void QEventDispatcher::registerTimer(QTimer* timer) {
+void QEventDispatcherUNIX::registerTimer(QTimer* timer) {
     m_timers.push_back(timer);
 }
 
-void QEventDispatcher::unregisterTimer(QTimer* timer) {
+void QEventDispatcherUNIX::unregisterTimer(QTimer* timer) {
     m_timers.erase(std::remove(m_timers.begin(), m_timers.end(), timer), m_timers.end());
 }
 
-void QEventDispatcher::registerSocketNotifier(QSocketNotifier* notifier) {
+void QEventDispatcherUNIX::registerSocketNotifier(QSocketNotifier* notifier) {
     m_socketNotifiers[notifier->fd()] = notifier;
 }
 
-void QEventDispatcher::unregisterSocketNotifier(int fd) {
+void QEventDispatcherUNIX::unregisterSocketNotifier(int fd) {
     m_socketNotifiers.erase(fd);
 }
 
-void QEventDispatcher::postEvent(QEvent* event) {
+void QEventDispatcherUNIX::postEvent(QEvent* event) {
     m_eventQueue.push(event);
 }
 
-void QEventDispatcher::processEvents() {
+void QEventDispatcherUNIX::processEvents() {
     // Process event queue
     while (!m_eventQueue.empty()) {
         QEvent* event = m_eventQueue.front();
@@ -84,4 +84,16 @@ void QEventDispatcher::processEvents() {
             }
         }
     }
+
+    if (m_interrupted) {
+        m_interrupted = false;
+    }
+}
+
+void QEventDispatcherUNIX::interrupt() {
+    m_interrupted = true;
+}
+
+void QEventDispatcherUNIX::wakeUp() {
+    // TODO: Implementation to wake up the event loop
 }

@@ -1,5 +1,4 @@
-#ifndef QEVENT_H
-#define QEVENT_H
+#pragma once
 
 class QEvent {
 public:
@@ -15,5 +14,3 @@ public:
 private:
     Type m_eventType;
 };
-
-#endif // QEVENT_H

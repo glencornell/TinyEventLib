@@ -1,14 +1,25 @@
+#include <QEventLoop.hpp>
 #include <QTimer.hpp>
 #include <QSocketNotifier.hpp>
+#include <QAbstractEventDispatcher.hpp>
+#include <QEventDispatcherUNIX.hpp>
+#include <QProperty.hpp>
 #include <iostream>
 #include <unistd.h>
 
 int main() {
-    QEventDispatcher dispatcher;
+    QEventDispatcherUNIX evd;
+    QEventLoop loop;
+
+    QProperty<int> property1 { 32 };
+    connect(property1.onValueChanged, [] (int i) {
+        std::cout << "property 1 changed: " << i << std::endl;
+    });
 
     QTimer timer1;
-    connect(timer1.timeout, []() {
+    connect(timer1.timeout, [&property1]() {
         std::cout << "Timer 1 expired!" << std::endl;
+        property1 = property1.value() + 1;
     });
     timer1.start(1000); // 1 second
 
@@ -34,9 +45,7 @@ int main() {
     });
     singleShotTimer.startSingleShot(3000); // 3 seconds
 
-    while (true) {
-        dispatcher.processEvents();
-    }
+    loop.exec();
 
     return 0;
 }

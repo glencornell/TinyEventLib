@@ -1,9 +1,8 @@
-#ifndef QSOCKETNOTIFIER_H
-#define QSOCKETNOTIFIER_H
+#pragma once
 
-#include "QEventDispatcher.hpp"
+#include "QAbstractEventDispatcher.hpp"
 #include "QObject.hpp"
-#include "Signal.hpp"
+#include "QSignal.hpp"
 
 class QSocketNotifier : public QObject {
 public:
@@ -13,24 +12,14 @@ public:
         Exception
     };
 
-    QSocketNotifier(int fd, Type type, QObject* parent = nullptr)
-        : QObject(parent), m_fd(fd), m_type(type) {
-        globalEventDispatcher->registerSocketNotifier(this);
-    }
+    QSocketNotifier(int fd, Type type, QObject* parent = nullptr);
+    ~QSocketNotifier();
 
-    ~QSocketNotifier() {
-        globalEventDispatcher->unregisterSocketNotifier(m_fd);
-    }
+    int fd() const;
 
-    int fd() const {
-        return m_fd;
-    }
-
-    Signal<> activated;
+    QSignal<> activated;
 
 private:
     int m_fd;
     Type m_type;
 };
-
-#endif // QSOCKETNOTIFIER_H

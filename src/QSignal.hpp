@@ -1,12 +1,11 @@
-#ifndef SIGNAL_H
-#define SIGNAL_H
+#pragma once
 
 #include <vector>
 #include <functional>
 #include <algorithm>
 
 template<typename... Args>
-class Signal {
+class QSignal {
 public:
     using SlotType = std::function<void(Args...)>;
 
@@ -16,9 +15,9 @@ public:
 
     void disconnect(SlotType slot) {
         auto it = std::remove_if(slots.begin(), slots.end(),
-            [&](const SlotType& other) {
-                return other.template target<void(Args...)>() == slot.template target<void(Args...)>();
-            });
+                                 [&](const SlotType& other) {
+                                     return other.template target<void(Args...)>() == slot.template target<void(Args...)>();
+                                 });
         slots.erase(it, slots.end());
     }
 
@@ -34,8 +33,6 @@ private:
 
 // Convenience function
 template<typename... Args>
-inline void connect(Signal<Args...>& signal, typename Signal<Args...>::SlotType slot) {
+inline void connect(QSignal<Args...>& signal, typename QSignal<Args...>::SlotType slot) {
     signal.connect(std::move(slot));
 }
-
-#endif // SIGNAL_H
