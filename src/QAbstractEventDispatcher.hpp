@@ -3,11 +3,6 @@
 #include "QEvent.hpp"
 #include "QObject.hpp"
 #include "QSignal.hpp"
-#include <functional>
-#include <queue>
-#include <chrono>
-#include <vector>
-#include <map>
 
 class QTimer;
 class QSocketNotifier;

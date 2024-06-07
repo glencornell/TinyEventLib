@@ -1,13 +1,13 @@
 #pragma once
 
+#include "function_ref.hpp"
 #include <vector>
-#include <functional>
 #include <algorithm>
 
 template<typename... Args>
 class QSignal {
 public:
-    using SlotType = std::function<void(Args...)>;
+    using SlotType = function_ref<void(Args...)>;
 
     void connect(SlotType slot) {
         slots.push_back(std::move(slot));

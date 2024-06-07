@@ -4,7 +4,6 @@
 #include <vector>
 #include <map>
 #include <queue>
-#include <chrono>
 
 class QEventDispatcherUNIX : public QAbstractEventDispatcher {
 public:
