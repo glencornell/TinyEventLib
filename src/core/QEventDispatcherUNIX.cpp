@@ -8,6 +8,9 @@
 #include <unistd.h>
 #include <sys/eventfd.h>
 
+static QEventDispatcherUNIX globalEventDispatcherUnix;
+QAbstractEventDispatcher* globalEventDispatcher = &globalEventDispatcherUnix;
+
 QEventDispatcherUNIX::QEventDispatcherUNIX(QObject* parent)
     : QAbstractEventDispatcher(parent), m_interrupted(false) {
     if (globalEventDispatcher == nullptr) {
@@ -16,11 +19,11 @@ QEventDispatcherUNIX::QEventDispatcherUNIX(QObject* parent)
 }
 
 void QEventDispatcherUNIX::registerTimer(QTimer* timer) {
-    m_timers.push_back(timer);
+    m_timers[timer->timerId()] = timer;
 }
 
 void QEventDispatcherUNIX::unregisterTimer(QTimer* timer) {
-    m_timers.erase(std::remove(m_timers.begin(), m_timers.end(), timer), m_timers.end());
+    m_timers.erase(timer->timerId());
 }
 
 void QEventDispatcherUNIX::registerSocketNotifier(QSocketNotifier* notifier) {
@@ -49,9 +52,11 @@ void QEventDispatcherUNIX::processEvents() {
     }
 
     // Handle timers
-    auto now = std::chrono::steady_clock::now();
+    const auto now = std::chrono::steady_clock::now();
+    auto next{now + std::chrono::milliseconds(100)};
     std::vector<QTimer*> expiredTimers;
-    for (QTimer* timer : m_timers) {
+    for (const auto& [id, timer] : m_timers) {
+        next = std::min(next, timer->nextTrigger());
         if (now >= timer->nextTrigger()) {
             expiredTimers.push_back(timer);
         }
@@ -72,8 +77,11 @@ void QEventDispatcherUNIX::processEvents() {
         pollfds.push_back(pfd);
     }
 
-    int timeout = 100; // 100 ms timeout
-    int ret = poll(pollfds.data(), pollfds.size(), timeout);
+    // Now wait for data on the SocketNotifiers, the time of the next
+    // expired timer, or 100ms, whichever comes first.
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(next - std::chrono::steady_clock::now());
+    int timeout = static_cast<int>(duration.count()) < 0 ? 0 : static_cast<int>(duration.count());
+    const int ret = poll(pollfds.data(), pollfds.size(), timeout);
     if (ret > 0) {
         for (const auto& pfd : pollfds) {
             if (pfd.revents & POLLIN) {
@@ -95,5 +103,8 @@ void QEventDispatcherUNIX::interrupt() {
 }
 
 void QEventDispatcherUNIX::wakeUp() {
-    // TODO: Implementation to wake up the event loop
+    // TODO: Implementation to wake up the event loop.  Add a
+    // SocketNotifier to the read end of a pipe.  This call would send
+    // data to the pipe.  This is not needed at the moment because I
+    // don't want to support multiple threads in this library.
 }

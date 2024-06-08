@@ -1,6 +1,7 @@
 #pragma once
 
 #include "QAbstractEventDispatcher.hpp"
+#include "QTimer.hpp"
 #include <vector>
 #include <map>
 #include <queue>
@@ -22,7 +23,7 @@ public:
     void wakeUp() override;
 
 private:
-    std::vector<QTimer*> m_timers;
+    std::map<QTimer::timerid_t, QTimer*> m_timers;
     std::map<int, QSocketNotifier*> m_socketNotifiers;
     std::queue<QEvent*> m_eventQueue;
     bool m_interrupted;
