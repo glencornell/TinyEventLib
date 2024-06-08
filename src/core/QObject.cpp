@@ -48,12 +48,7 @@ const std::vector<QObject*>& QObject::children() const {
 
 bool QObject::event(QEvent* event) {
     for (auto filter : m_eventFilters) {
-        if (filter->eventFilter(event)) {
-            return true;
-        }
-    }
-    for (auto child : m_children) {
-        if (child->event(event)) {
+        if (filter->eventFilter(this, event)) {
             return true;
         }
     }
@@ -72,14 +67,6 @@ void QObject::removeChild(QObject* child) {
     m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
 }
 
-void QObject::addObject(QObject* object) {
-    g_topLevelObjects.push_back(object);
-}
-
-void QObject::removeObject(QObject* object) {
-    g_topLevelObjects.erase(std::remove(g_topLevelObjects.begin(), g_topLevelObjects.end(), object), g_topLevelObjects.end());
-}
-
 void QObject::installEventFilter(QObject* filter) {
     m_eventFilters.push_back(filter);
 }
@@ -88,6 +75,6 @@ void QObject::removeEventFilter(QObject* filter) {
     m_eventFilters.erase(std::remove(m_eventFilters.begin(), m_eventFilters.end(), filter), m_eventFilters.end());
 }
 
-bool QObject::eventFilter(QEvent* event) {
+bool QObject::eventFilter(QObject *watched, QEvent* event) {
     return false;
 }

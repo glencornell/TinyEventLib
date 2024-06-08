@@ -16,7 +16,7 @@ public:
     void disconnect(SlotType slot) {
         auto it = std::remove_if(slots.begin(), slots.end(),
                                  [&](const SlotType& other) {
-                                     return other.template target<void(Args...)>() == slot.template target<void(Args...)>();
+                                     return other.target() == slot.target();
                                  });
         slots.erase(it, slots.end());
     }

@@ -4,8 +4,6 @@
 #include "QEvent.hpp"
 #include <vector>
 
-class QAbstractEventDispatcher;
-
 class QObject {
 public:
     explicit QObject(QObject* parent = nullptr);
@@ -18,12 +16,21 @@ public:
     virtual bool event(QEvent* event);
 
     static void connect(QSignal<>& signal, QSignal<>::SlotType slot);
-    static void addObject(QObject* object);
-    static void removeObject(QObject* object);
 
     void installEventFilter(QObject* filter);
     void removeEventFilter(QObject* filter);
-    bool eventFilter(QEvent* event);
+
+    /**
+     * @brief Filters events for the object.
+     *
+     * This method is called for all events sent to the object
+     * before they reach the event handler.
+     *
+     * @param object The object being watched.
+     * @param event The event to filter.
+     * @return true if the event should not be handled further; false otherwise.
+     */
+    virtual bool eventFilter(QObject *watched, QEvent* event);
 
 protected:
     void addChild(QObject* child);
