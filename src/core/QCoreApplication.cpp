@@ -4,9 +4,9 @@ QCoreApplication* QCoreApplication::m_instance{nullptr};
 QAbstractEventDispatcher* QCoreApplication::m_eventDispatcher{nullptr};
 
 QCoreApplication::QCoreApplication(int argc, char* argv[]) :
-    m_running(false) {
-    if (m_instance == nullptr)
-        m_instance = this;
+    m_running(false),
+    m_returnCode(0) {
+    m_instance = this;
 }
 
 QCoreApplication* QCoreApplication::instance() {
@@ -18,7 +18,6 @@ QCoreApplication::~QCoreApplication() {
 }
 
 void QCoreApplication::exit(int returnCode) {
-    std::cout << "Exiting with return code: " << returnCode << std::endl;
     m_returnCode = returnCode;
     m_running = false;
 }
@@ -29,17 +28,14 @@ void QCoreApplication::quit() {
 
 int QCoreApplication::exec() {
     if (m_running) {
-        std::cerr << "Already running" << std::endl;
         return -1;
     }
     m_running = true;
-    std::cout << "Starting event loop" << std::endl;
     while (m_running) {
         if (m_eventDispatcher) {
             m_eventDispatcher->processEvents();
         }
     }
-    std::cout << "Event loop finished" << std::endl;
     return m_returnCode;
 }
 

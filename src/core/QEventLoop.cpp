@@ -29,6 +29,5 @@ void QEventLoop::processEvents() {
 }
 
 void QEventLoop::quit() {
-    QAbstractEventDispatcher::instance()->interrupt();
     exit();
 }

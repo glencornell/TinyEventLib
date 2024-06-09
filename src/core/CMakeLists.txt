@@ -1,12 +1,21 @@
-add_library(QtCoreLite
+set(SOURCES
   QAbstractEventDispatcher.cpp
   QCoreApplication.cpp
-  QEventDispatcherUNIX.cpp
   QEventLoop.cpp
   QObject.cpp
   QSocketNotifier.cpp
   QTimer.cpp
 )
+
+if(WIN32)
+  list(APPEND SOURCES windows_specific.cpp)
+elseif(UNIX AND NOT APPLE)
+  list(APPEND SOURCES QEventDispatcherUNIX.cpp)
+elseif(APPLE)
+  list(APPEND SOURCES mac_specific.cpp)
+endif()
+
+add_library(QtCoreLite ${SOURCES})
 target_include_directories(QtCoreLite
   INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -19,6 +28,7 @@ target_compile_options(QtCoreLite PUBLIC
 )
 target_link_options(QtCoreLite PUBLIC
   $<$<CONFIG:Coverage>:-g>
+  -Wl,-u,globalEventDispatcher
 )
 target_link_libraries(QtCoreLite PUBLIC
   $<$<CONFIG:Coverage>:gcov>

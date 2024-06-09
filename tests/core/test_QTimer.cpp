@@ -5,20 +5,19 @@
 #include <chrono>
 #include <thread>
 
+QEventDispatcherUNIX dispatcher{nullptr};
+
 // Fixture class for QTimer tests
 class QTimerTest : public ::testing::Test {
 protected:
-    QEventDispatcherUNIX *dispatcher{nullptr};
     QTimer* timer{nullptr};
 
     void SetUp() override {
-        dispatcher = new QEventDispatcherUNIX(nullptr);
         timer = new QTimer();
     }
 
     void TearDown() override {
         delete timer;
-        delete dispatcher;
     }
 };
 

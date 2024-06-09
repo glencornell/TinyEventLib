@@ -1,12 +1,12 @@
-#include <QEventLoop.hpp>
+#include <QCoreApplication.hpp>
 #include <QTimer.hpp>
 #include <QSocketNotifier.hpp>
 #include <QProperty.hpp>
 #include <iostream>
 #include <unistd.h>
 
-int main() {
-    QEventLoop loop;
+int main(int argc, char* argv[]) {
+    QCoreApplication app(argc, argv);
 
     QProperty<int> property1 { 32 };
     connect(property1.onValueChanged, [] (int i) {
@@ -42,7 +42,7 @@ int main() {
     });
     singleShotTimer.startSingleShot(3000); // 3 seconds
 
-    loop.exec();
+    app.exec();
 
     return 0;
 }

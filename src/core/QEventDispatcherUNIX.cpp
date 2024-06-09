@@ -9,14 +9,15 @@
 #include <unistd.h>
 #include <sys/eventfd.h>
 
-static QEventDispatcherUNIX globalEventDispatcher(nullptr);
-QEventDispatcherUNIX* QEventDispatcherUNIX::m_instance{nullptr};
+QEventDispatcherUNIX globalEventDispatcher(nullptr);
 
 QEventDispatcherUNIX::QEventDispatcherUNIX(QObject* parent)
-    : QAbstractEventDispatcher(parent), m_interrupted(false) {
-    if (m_instance == nullptr)
-        m_instance = this;
+    : QAbstractEventDispatcher(parent) {
     QCoreApplication::setEventDispatcher(this);
+}
+
+QEventDispatcherUNIX::~QEventDispatcherUNIX() {
+    QCoreApplication::setEventDispatcher(nullptr);
 }
 
 void QEventDispatcherUNIX::registerTimer(QTimer* timer) {
@@ -93,12 +94,4 @@ void QEventDispatcherUNIX::processEvents() {
             }
         }
     }
-
-    if (m_interrupted) {
-        m_interrupted = false;
-    }
-}
-
-void QEventDispatcherUNIX::interrupt() {
-    m_interrupted = true;
 }

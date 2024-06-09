@@ -10,6 +10,7 @@ class QSocketNotifier;
 class QAbstractEventDispatcher : public QObject {
 public:
     explicit QAbstractEventDispatcher(QObject* parent = nullptr);
+    virtual ~QAbstractEventDispatcher();
 
     static QAbstractEventDispatcher* instance();
 
@@ -21,7 +22,6 @@ public:
 
     virtual void postEvent(QObject *receiver, QEvent* event) = 0;
     virtual void processEvents() = 0;
-    virtual void interrupt() = 0;
 private:
     static QAbstractEventDispatcher* m_instance;
 };

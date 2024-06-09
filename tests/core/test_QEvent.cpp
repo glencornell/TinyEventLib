@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 #include "QCoreApplication.hpp"
-#include "QEventLoop.hpp"
 #include "QTimer.hpp"
+
+QCoreApplication app{0, nullptr};
 
 class EventReceiver : public QObject {
 public:
@@ -21,13 +22,10 @@ protected:
 
 class QEventTest : public ::testing::Test {
 protected:
-    QCoreApplication *app{nullptr};
     void SetUp() override {
-        app = new QCoreApplication(0, nullptr);
     }
 
     void TearDown() override {
-        delete app;
     }
 };
 
@@ -35,8 +33,9 @@ TEST_F(QEventTest, ProcessEvents) {
     EventReceiver receiver;
     QTimer timer;
 
-    connect(&timer, &QTimer::timeout, &receiver, [&receiver, &app]() {
-        app.postEvent(&receiver, new QEvent("QEvent::User"));
+    app.postEvent(&receiver, new QEvent("QEvent::User"));
+
+    connect(timer.timeout, [&receiver, this]() {
         app.quit();
     });
     timer.start(100);
@@ -46,18 +45,18 @@ TEST_F(QEventTest, ProcessEvents) {
     EXPECT_TRUE(receiver.eventReceived);
 }
 
-TEST_F(QEventTest, CustomEventLoop) {
+TEST_F(QEventTest, SendEvent) {
     EventReceiver receiver;
-    QEventLoop eventLoop;
     QTimer timer;
 
-    connect(&timer, &QTimer::timeout, &receiver, [&receiver, &eventLoop]() {
-        QCoreApplication::postEvent(&receiver, new QEvent("QEvent::User"));
-        eventLoop.quit();
+    connect(timer.timeout, [&receiver, this]() {
+        QEvent ev("QEvent::User");
+        app.sendEvent(&receiver, &ev);
+        app.quit();
     });
     timer.start(100);
 
-    eventLoop.exec();
+    app.exec();
 
     EXPECT_TRUE(receiver.eventReceived);
 }
