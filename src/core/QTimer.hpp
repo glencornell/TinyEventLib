@@ -21,6 +21,8 @@ public:
     bool isSingleShot() const;
     void updateNextTrigger();
 
+    static void singleShot(int msec, QObject *receiver, const char *member);
+
     QSignal<> timeout;
 
 private:

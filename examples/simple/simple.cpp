@@ -1,14 +1,11 @@
 #include <QEventLoop.hpp>
 #include <QTimer.hpp>
 #include <QSocketNotifier.hpp>
-#include <QAbstractEventDispatcher.hpp>
-#include <QEventDispatcherUNIX.hpp>
 #include <QProperty.hpp>
 #include <iostream>
 #include <unistd.h>
 
 int main() {
-    QEventDispatcherUNIX evd;
     QEventLoop loop;
 
     QProperty<int> property1 { 32 };

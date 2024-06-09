@@ -2,7 +2,6 @@
 
 #include "QAbstractEventDispatcher.hpp"
 #include "QTimer.hpp"
-#include <vector>
 #include <map>
 #include <queue>
 
@@ -16,15 +15,15 @@ public:
     void registerSocketNotifier(QSocketNotifier* notifier) override;
     void unregisterSocketNotifier(int fd) override;
 
-    void postEvent(QEvent* event) override;
+    void postEvent(QObject *receiver, QEvent* event) override;
 
     void processEvents() override;
     void interrupt() override;
-    void wakeUp() override;
 
 private:
     std::map<QTimer::timerid_t, QTimer*> m_timers;
     std::map<int, QSocketNotifier*> m_socketNotifiers;
     std::queue<QEvent*> m_eventQueue;
     bool m_interrupted;
+    static QEventDispatcherUNIX *m_instance;
 };

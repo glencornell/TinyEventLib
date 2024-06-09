@@ -1,20 +1,24 @@
 #include <gtest/gtest.h>
 #include "QTimer.hpp"
 #include "QAbstractEventDispatcher.hpp"
+#include "QEventDispatcherUNIX.hpp"
 #include <chrono>
 #include <thread>
 
 // Fixture class for QTimer tests
 class QTimerTest : public ::testing::Test {
 protected:
+    QEventDispatcherUNIX *dispatcher{nullptr};
     QTimer* timer{nullptr};
 
     void SetUp() override {
+        dispatcher = new QEventDispatcherUNIX(nullptr);
         timer = new QTimer();
     }
 
     void TearDown() override {
         delete timer;
+        delete dispatcher;
     }
 };
 
@@ -55,7 +59,7 @@ TEST_F(QTimerTest, TimerIdIncrements) {
     EXPECT_EQ(timer2.timerId(), timer->timerId() + 2);
 }
 
-TEST_F(QTimerTest, UpdateNextTrigger_zeroSleep) {
+TEST_F(QTimerTest, UpdateNextTrigger) {
     uint32_t interval = 100;
     timer->start(interval);
 
@@ -76,7 +80,7 @@ TEST_F(QTimerTest, TimeoutSignal) {
     uint32_t interval = 100;
     timer->start(interval);
     std::this_thread::sleep_for(std::chrono::milliseconds(interval + 50));
-    globalEventDispatcher->processEvents();
+    QAbstractEventDispatcher::instance()->processEvents();
 
     EXPECT_TRUE(timeoutCalled);
 }

@@ -25,14 +25,10 @@ bool QEventLoop::isRunning() const {
 }
 
 void QEventLoop::processEvents() {
-    globalEventDispatcher->processEvents();
+    QAbstractEventDispatcher::instance()->processEvents();
 }
 
 void QEventLoop::quit() {
-    globalEventDispatcher->interrupt();
+    QAbstractEventDispatcher::instance()->interrupt();
     exit();
-}
-
-void QEventLoop::wakeUp() {
-    globalEventDispatcher->wakeUp();
 }

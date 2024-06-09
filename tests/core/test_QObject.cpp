@@ -30,7 +30,7 @@ TEST_F(QObjectTest, ParentChildRelationship) {
 
 TEST_F(QObjectTest, EventHandling) {
     QObject obj;
-    QEvent event(QEvent::Timer);
+    QEvent event("QEvent::Timer");
 
     EXPECT_FALSE(obj.event(&event));
 }
@@ -48,7 +48,7 @@ public:
 TEST_F(QObjectTest, EventFilterInstallation) {
     QObject obj;
     TestEventFilter filter;
-    QEvent event(QEvent::Timer);
+    QEvent event("QEvent::Timer");
 
     obj.installEventFilter(&filter);
     obj.event(&event);

@@ -19,7 +19,7 @@ void QTimer::start(uint32_t msec) {
     m_singleShot = false;
     m_initialTrigger = std::chrono::steady_clock::now();
     m_nextTrigger = m_initialTrigger + std::chrono::milliseconds(msec);
-    globalEventDispatcher->registerTimer(this);
+    QAbstractEventDispatcher::instance()->registerTimer(this);
 }
 
 void QTimer::startSingleShot(uint32_t msec) {
@@ -27,11 +27,11 @@ void QTimer::startSingleShot(uint32_t msec) {
     m_singleShot = true;
     m_initialTrigger = std::chrono::steady_clock::now();
     m_nextTrigger = m_initialTrigger + std::chrono::milliseconds(msec);
-    globalEventDispatcher->registerTimer(this);
+    QAbstractEventDispatcher::instance()->registerTimer(this);
 }
 
 void QTimer::stop() {
-    globalEventDispatcher->unregisterTimer(this);
+    QAbstractEventDispatcher::instance()->unregisterTimer(this);
 }
 
 QTimer::timerid_t QTimer::timerId() const {

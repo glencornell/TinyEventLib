@@ -1,5 +1,6 @@
 add_library(QtCoreLite
   QAbstractEventDispatcher.cpp
+  QCoreApplication.cpp
   QEventDispatcherUNIX.cpp
   QEventLoop.cpp
   QObject.cpp

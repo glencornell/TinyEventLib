@@ -1,4 +1,5 @@
 #include "QEventDispatcherUNIX.hpp"
+#include "QCoreApplication.hpp"
 #include "QTimer.hpp"
 #include "QSocketNotifier.hpp"
 #include "QObject.hpp"
@@ -8,14 +9,14 @@
 #include <unistd.h>
 #include <sys/eventfd.h>
 
-static QEventDispatcherUNIX globalEventDispatcherUnix;
-QAbstractEventDispatcher* globalEventDispatcher = &globalEventDispatcherUnix;
+static QEventDispatcherUNIX globalEventDispatcher(nullptr);
+QEventDispatcherUNIX* QEventDispatcherUNIX::m_instance{nullptr};
 
 QEventDispatcherUNIX::QEventDispatcherUNIX(QObject* parent)
     : QAbstractEventDispatcher(parent), m_interrupted(false) {
-    if (globalEventDispatcher == nullptr) {
-        globalEventDispatcher = this;
-    }
+    if (m_instance == nullptr)
+        m_instance = this;
+    QCoreApplication::setEventDispatcher(this);
 }
 
 void QEventDispatcherUNIX::registerTimer(QTimer* timer) {
@@ -34,7 +35,7 @@ void QEventDispatcherUNIX::unregisterSocketNotifier(int fd) {
     m_socketNotifiers.erase(fd);
 }
 
-void QEventDispatcherUNIX::postEvent(QEvent* event) {
+void QEventDispatcherUNIX::postEvent(QObject *receiver, QEvent* event) {
     m_eventQueue.push(event);
 }
 
@@ -100,11 +101,4 @@ void QEventDispatcherUNIX::processEvents() {
 
 void QEventDispatcherUNIX::interrupt() {
     m_interrupted = true;
-}
-
-void QEventDispatcherUNIX::wakeUp() {
-    // TODO: Implementation to wake up the event loop.  Add a
-    // SocketNotifier to the read end of a pipe.  This call would send
-    // data to the pipe.  This is not needed at the moment because I
-    // don't want to support multiple threads in this library.
 }

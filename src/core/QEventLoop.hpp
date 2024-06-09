@@ -13,7 +13,6 @@ public:
 
     void processEvents();
     void quit();
-    void wakeUp();
 
 private:
     bool m_running;

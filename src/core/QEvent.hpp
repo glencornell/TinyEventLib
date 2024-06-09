@@ -2,9 +2,7 @@
 
 class QEvent {
 public:
-    enum Type {
-        Timer
-    };
+    using Type = const char*;
 
     explicit QEvent(Type type) : m_eventType(type) {}
     virtual ~QEvent() = default;

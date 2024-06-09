@@ -42,4 +42,5 @@ private:
     std::vector<QObject*> m_eventFilters;
 };
 
+// Global container of top-level QObject pointers
 extern std::vector<QObject*> g_topLevelObjects;

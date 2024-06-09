@@ -2,11 +2,11 @@
 
 QSocketNotifier::QSocketNotifier(int fd, Type type, QObject* parent)
     : QObject(parent), m_fd(fd), m_type(type) {
-    globalEventDispatcher->registerSocketNotifier(this);
+    QAbstractEventDispatcher::instance()->registerSocketNotifier(this);
 }
 
 QSocketNotifier::~QSocketNotifier() {
-    globalEventDispatcher->unregisterSocketNotifier(m_fd);
+    QAbstractEventDispatcher::instance()->unregisterSocketNotifier(m_fd);
 }
 
 int QSocketNotifier::fd() const {
