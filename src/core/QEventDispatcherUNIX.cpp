@@ -29,7 +29,7 @@ void QEventDispatcherUNIX::unregisterTimer(QTimer* timer) {
 }
 
 void QEventDispatcherUNIX::registerSocketNotifier(QSocketNotifier* notifier) {
-    m_socketNotifiers[notifier->fd()] = notifier;
+    m_socketNotifiers[notifier->socket()] = notifier;
 }
 
 void QEventDispatcherUNIX::unregisterSocketNotifier(int fd) {
@@ -75,8 +75,10 @@ void QEventDispatcherUNIX::processEvents() {
     // Handle socket notifiers
     std::vector<struct pollfd> pollfds;
     for (const auto& [fd, notifier] : m_socketNotifiers) {
-        struct pollfd pfd = {fd, POLLIN, 0};
-        pollfds.push_back(pfd);
+        if (notifier->isEnabled()) {
+            struct pollfd pfd = {fd, POLLIN, 0};
+            pollfds.push_back(pfd);
+        }
     }
 
     // Now wait for data on the SocketNotifiers, the time of the next

@@ -14,12 +14,16 @@ public:
 
     QSocketNotifier(int fd, Type type, QObject* parent = nullptr);
     ~QSocketNotifier();
+    bool isEnabled() const;
+    void setEnabled(bool enable);
+    Type type() const;
 
-    int fd() const;
+    int socket() const;
 
     QSignal<> activated;
 
 private:
     int m_fd;
     Type m_type;
+    bool m_enabled;
 };

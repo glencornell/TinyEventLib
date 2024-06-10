@@ -2,7 +2,7 @@
 #include "QCoreApplication.hpp"
 #include "QTimer.hpp"
 
-QCoreApplication app{0, nullptr};
+static QCoreApplication app{0, nullptr};
 
 class EventReceiver : public QObject {
 public:

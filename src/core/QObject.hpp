@@ -17,6 +17,18 @@ public:
 
     static void connect(QSignal<>& signal, QSignal<>::SlotType slot);
 
+    template <typename Sender, typename Signal, typename Receiver, typename Slot>
+    static void connect(Sender* sender, Signal signal, Receiver* receiver, Slot slot) {
+        (sender->*signal).connect([receiver, slot](auto&&... args) {
+            (receiver->*slot)(std::forward<decltype(args)>(args)...);
+        });
+    }
+
+    template <typename Sender, typename Signal, typename Func>
+    static void connect(Sender* sender, Signal signal, Func func) {
+        (sender->*signal).connect(func);
+    }
+
     void installEventFilter(QObject* filter);
     void removeEventFilter(QObject* filter);
 

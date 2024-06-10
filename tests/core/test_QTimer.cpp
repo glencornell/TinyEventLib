@@ -5,7 +5,7 @@
 #include <chrono>
 #include <thread>
 
-QEventDispatcherUNIX dispatcher{nullptr};
+static QEventDispatcherUNIX dispatcher{nullptr};
 
 // Fixture class for QTimer tests
 class QTimerTest : public ::testing::Test {
