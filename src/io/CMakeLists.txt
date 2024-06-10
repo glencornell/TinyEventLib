@@ -7,7 +7,7 @@ target_include_directories(QtIOLite
   $<INSTALL_INTERFACE:include/QtLite/core>
 )
 
-# Set coverage flags:
+# Set compiler flags:
 target_compile_options(QtIOLite PUBLIC
   $<$<CONFIG:Coverage>:-O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g>
 )
@@ -15,5 +15,6 @@ target_link_options(QtIOLite PUBLIC
   $<$<CONFIG:Coverage>:-g>
 )
 target_link_libraries(QtIOLite PUBLIC
+  QtCoreLite
   $<$<CONFIG:Coverage>:gcov>
 )
