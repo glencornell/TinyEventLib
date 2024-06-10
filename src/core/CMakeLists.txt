@@ -23,8 +23,8 @@ target_include_directories(QtCoreLite
 )
 
 # Set coverage flags:
-target_compile_options(QtCoreLite PUBLIC
-  $<$<CONFIG:Coverage>:-O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g>
+target_compile_options(QtCoreLite PRIVATE
+  $<$<CONFIG:Coverage>:${GLOBAL_COVERAGE_COMPILE_OPTIONS}>
 )
 target_link_options(QtCoreLite PUBLIC
   $<$<CONFIG:Coverage>:-g>

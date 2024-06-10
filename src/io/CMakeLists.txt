@@ -4,12 +4,12 @@ add_library(QtIOLite
 target_include_directories(QtIOLite
   INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include/QtLite/core>
+  $<INSTALL_INTERFACE:include/QtLite/io>
 )
 
 # Set compiler flags:
-target_compile_options(QtIOLite PUBLIC
-  $<$<CONFIG:Coverage>:-O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g>
+target_compile_options(QtIOLite PRIVATE
+  $<$<CONFIG:Coverage>:${GLOBAL_COVERAGE_COMPILE_OPTIONS}>
 )
 target_link_options(QtIOLite PUBLIC
   $<$<CONFIG:Coverage>:-g>

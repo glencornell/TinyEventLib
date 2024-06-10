@@ -13,6 +13,10 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Create global compiler and linker options
+set(GLOBAL_COVERAGE_COMPILE_OPTIONS -O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g)
+
+# Create the custom target for all unit and integration tests
 enable_testing()
 add_custom_target(check
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --timeout 20s
