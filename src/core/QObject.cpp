@@ -47,11 +47,6 @@ const std::vector<QObject*>& QObject::children() const {
 }
 
 bool QObject::event(QEvent* theEvent) {
-    for (auto filter : m_eventFilters) {
-        if (filter->eventFilter(this, theEvent)) {
-            return true;
-        }
-    }
     return false;
 }
 

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "QObject.hpp"
+#include "QCoreApplication.hpp"
 
 class TestEventFilter : public QObject {
 public:
@@ -46,18 +47,19 @@ TEST_F(QObjectTest, DefaultEventHandling) {
 }
 
 TEST_F(QObjectTest, EventFilterInstallation) {
+    QCoreApplication app(0, nullptr);
     QObject obj;
     TestEventFilter filter;
     QEvent event("QEvent::Timer");
 
     obj.installEventFilter(&filter);
-    obj.event(&event);
+    app.notify(&obj, &event);
 
     EXPECT_TRUE(filter.filterEventCalled);
 
     filter.filterEventCalled = false;
     obj.removeEventFilter(&filter);
-    obj.event(&event);
+    app.notify(&obj, &event);
 
     EXPECT_FALSE(filter.filterEventCalled);
 }
@@ -83,4 +85,19 @@ TEST_F(QObjectTest, SignalSlotConnection) {
 
     signal();
     EXPECT_TRUE(slotCalled);
+}
+
+static bool childDeleted = false;
+
+class DeletedObject : public QObject {
+    ~DeletedObject() {
+        childDeleted = true;
+    }
+};
+
+TEST_F(QObjectTest, DeleteChildren) {
+    QObject* parent = new QObject(nullptr);
+    QObject* child = new QObject(parent);
+    delete parent;
+    EXPECT_TRUE(childDeleted);
 }

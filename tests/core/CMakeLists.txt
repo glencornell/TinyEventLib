@@ -1,10 +1,11 @@
 add_executable(test_core
-  test_function_ref.cpp
+  test_QCoreApplication.cpp
+  test_QEvent.cpp
   test_QObject.cpp
   test_QSignal.cpp
-  test_QTimer.cpp
-  test_QEvent.cpp
   test_QSocketNotifier.cpp
+  test_QTimer.cpp
+  test_function_ref.cpp
 )
 target_link_libraries(test_core PUBLIC QtCoreLite gtest_main gtest)
 
