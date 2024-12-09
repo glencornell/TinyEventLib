@@ -1,9 +1,13 @@
 # Tiny Event Library
 
-This is a rewrite of the event processing loop in Qt Core.  I wrote it
-as a way to educate myself on modern C++.
+This is a rewrite of the event processing loop in Qt Core using C++20.  It's not a clone of Qt and was not intended to
+be one.  Rather, I wrote it as a way to educate myself on modern C++ and explore how the Qt framework could work if it
+were implemented in C++20.
+
+Don't use this. Use Qt or CopperSpice instead. It's not thread safe and is missing a ton of features. Having said that,
+I would like to port this to Arduino as a fun exercise.
 
 # TODO:
-- [ ] Refactor to run in memory-constrained environments (i.e. Arduino) [staticFunctional](https://github.com/luni64/staticFunctional) is a good example
-- [ ] Add signal handlers
-- [ ] Consider refactoring implementation of QTimer with timerfd
+- [ ] Refactor to run in memory-constrained environments (i.e. Arduino).
+- [ ] Add signal handling, perhaps with signalfd on Linux.
+- [ ] Consider refactoring implementation of QTimer with timerfd on Linux.
