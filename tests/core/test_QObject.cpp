@@ -1,6 +1,16 @@
 #include <gtest/gtest.h>
 #include "QObject.hpp"
 
+class TestEventFilter : public QObject {
+public:
+    bool filterEventCalled = false;
+
+    bool eventFilter(QObject* watched, QEvent* event) override {
+        filterEventCalled = true;
+        return false;
+    }
+};
+
 class QObjectTest : public ::testing::Test {
 protected:
     void SetUp() override {
@@ -28,22 +38,12 @@ TEST_F(QObjectTest, ParentChildRelationship) {
     EXPECT_EQ(parent.children().size(), 0);
 }
 
-TEST_F(QObjectTest, EventHandling) {
+TEST_F(QObjectTest, DefaultEventHandling) {
     QObject obj;
     QEvent event("QEvent::Timer");
 
     EXPECT_FALSE(obj.event(&event));
 }
-
-class TestEventFilter : public QObject {
-public:
-    bool filterEventCalled = false;
-
-    bool eventFilter(QObject* watched, QEvent* event) override {
-        filterEventCalled = true;
-        return true; // Indicate that the event was handled
-    }
-};
 
 TEST_F(QObjectTest, EventFilterInstallation) {
     QObject obj;

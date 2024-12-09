@@ -36,23 +36,7 @@ void QEventDispatcherUNIX::unregisterSocketNotifier(int fd) {
     m_socketNotifiers.erase(fd);
 }
 
-void QEventDispatcherUNIX::postEvent(QObject *receiver, QEvent* event) {
-    m_eventQueue.push(event);
-}
-
 void QEventDispatcherUNIX::processEvents() {
-    // Process event queue
-    while (!m_eventQueue.empty()) {
-        QEvent* event = m_eventQueue.front();
-        m_eventQueue.pop();
-
-        for (QObject* obj : g_topLevelObjects) {
-            obj->event(event);
-        }
-
-        delete event;
-    }
-
     // Handle timers
     const auto now = std::chrono::steady_clock::now();
     auto next{now + std::chrono::milliseconds(100)};
@@ -65,32 +49,28 @@ void QEventDispatcherUNIX::processEvents() {
     }
     for (QTimer* timer : expiredTimers) {
         timer->timeout();
-        if (!timer->isSingleShot()) {
-            timer->updateNextTrigger();
-        } else {
+        timer->updateNextTrigger();
+        if (timer->isSingleShot()) {
             unregisterTimer(timer);
         }
     }
 
-    // Handle socket notifiers
-    std::vector<struct pollfd> pollfds;
+    // Create pollfds from enabled notifiers
+    m_pollfds.clear();
     for (const auto& [fd, notifier] : m_socketNotifiers) {
         if (notifier->isEnabled()) {
-            struct pollfd pfd = {fd, POLLIN, 0};
-            pollfds.push_back(pfd);
+            m_pollfds.push_back({fd, POLLIN, 0});
+            m_notifierCache[fd] = notifier;
         }
     }
 
-    // Now wait for data on the SocketNotifiers, the time of the next
-    // expired timer, or 100ms, whichever comes first.
+    // Poll for data on the SocketNotifiers, the next expired timer, or 100ms, whichever comes first.
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(next - std::chrono::steady_clock::now());
-    int timeout = static_cast<int>(duration.count()) < 0 ? 0 : static_cast<int>(duration.count());
-    const int ret = poll(pollfds.data(), pollfds.size(), timeout);
-    if (ret > 0) {
-        for (const auto& pfd : pollfds) {
+    int timeout = std::max(0, static_cast<int>(duration.count()));
+    if (auto ret = ::poll(m_pollfds.data(), m_pollfds.size(), timeout); ret > 0) {
+        for (const auto& pfd : m_pollfds) {
             if (pfd.revents & POLLIN) {
-                auto it = m_socketNotifiers.find(pfd.fd);
-                if (it != m_socketNotifiers.end()) {
+                if (auto it = m_notifierCache.find(pfd.fd); it != m_notifierCache.end()) {
                     it->second->activated();
                 }
             }

@@ -10,11 +10,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-# Create global compiler and linker options
-set(GLOBAL_COVERAGE_COMPILE_OPTIONS -O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g)
 
 # Create the custom target for all unit and integration tests
 enable_testing()
@@ -23,9 +20,13 @@ add_custom_target(check
     COMMENT "Running all tests with output on failure and a timeout of 20 seconds"
   )
 
+# Create global compiler and linker options
+set(GLOBAL_COVERAGE_COMPILE_OPTIONS -O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g)
+
+# Add the coverage target
+include(cmake/coverage.cmake)
+
 add_subdirectory(third-party)
 add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(tests)
-
-include(cmake/coverage.cmake)

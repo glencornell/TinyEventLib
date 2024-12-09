@@ -83,3 +83,17 @@ TEST_F(QTimerTest, TimeoutSignal) {
 
     EXPECT_TRUE(timeoutCalled);
 }
+
+TEST_F(QTimerTest, TimeoutSingleShot) {
+    bool timeoutCalled = false;
+    timer->timeout.connect([&]() {
+        timeoutCalled = true;
+    });
+
+    uint32_t interval = 100;
+    timer->startSingleShot(interval);
+    std::this_thread::sleep_for(std::chrono::milliseconds(interval + 50));
+    QAbstractEventDispatcher::instance()->processEvents();
+
+    EXPECT_TRUE(timeoutCalled);
+}

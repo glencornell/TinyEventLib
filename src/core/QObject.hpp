@@ -44,6 +44,10 @@ public:
      */
     virtual bool eventFilter(QObject *watched, QEvent* event);
 
+    const auto& eventFilters() const {
+        return m_eventFilters;
+    }
+
 protected:
     void addChild(QObject* child);
     void removeChild(QObject* child);
