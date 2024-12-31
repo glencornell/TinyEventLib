@@ -21,7 +21,28 @@ public:
     bool isSingleShot() const;
     void updateNextTrigger();
 
-    static void singleShot(int msec, QObject *receiver, const char *member);
+    static void singleShot(uint32_t msec, const QSignal<>::SlotType& slot) {
+        // TODO: this creates a memory leak. Create a deferred deletion object queue in EventDispatcherUNIX
+        QTimer *timer = new QTimer;
+        connect(timer, &QTimer::timeout, slot);
+        timer->startSingleShot(msec);
+    }
+
+    template <typename Receiver, typename Slot>
+    static void singleShot(uint32_t msec, Receiver* receiver, Slot slot) {
+        // TODO: this creates a memory leak. Create a deferred deletion object queue in EventDispatcherUNIX
+        QTimer *timer = new QTimer;
+        connect(timer, &QTimer::timeout, receiver, slot);
+        timer->startSingleShot(msec);
+    }
+
+    template <typename Func>
+    static void singleShot(uint32_t msec, Func func) {
+        // TODO: this creates a memory leak. Create a deferred deletion object queue in EventDispatcherUNIX
+        QTimer *timer = new QTimer;
+        connect(timer, &QTimer::timeout, func);
+        timer->startSingleShot(msec);
+    }
 
     QSignal<> timeout;
 

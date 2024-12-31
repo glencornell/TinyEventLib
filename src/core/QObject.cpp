@@ -50,10 +50,6 @@ bool QObject::event(QEvent* theEvent) {
     return false;
 }
 
-void QObject::connect(QSignal<>& signal, QSignal<>::SlotType slot) {
-    signal.connect(std::move(slot));
-}
-
 void QObject::addChild(QObject* child) {
     m_children.push_back(child);
 }

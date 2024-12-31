@@ -90,6 +90,8 @@ TEST_F(QObjectTest, SignalSlotConnection) {
 static bool childDeleted = false;
 
 class DeletedObject : public QObject {
+public:
+    DeletedObject(QObject *parent = nullptr) : QObject(parent) { }
     ~DeletedObject() {
         childDeleted = true;
     }
@@ -97,7 +99,7 @@ class DeletedObject : public QObject {
 
 TEST_F(QObjectTest, DeleteChildren) {
     QObject* parent = new QObject(nullptr);
-    QObject* child = new QObject(parent);
+    QObject* child = new DeletedObject(parent);
     delete parent;
     EXPECT_TRUE(childDeleted);
 }

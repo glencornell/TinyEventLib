@@ -97,3 +97,19 @@ TEST_F(QTimerTest, TimeoutSingleShot) {
 
     EXPECT_TRUE(timeoutCalled);
 }
+
+class Receiver : public QObject {
+public:
+    bool timeoutCalled = false;
+    void onTimerExpired() {
+        timeoutCalled = true;
+    }
+};
+
+TEST_F(QTimerTest, SingleShotFunction) {
+    Receiver r;
+    QTimer::singleShot(0, &r, &Receiver::onTimerExpired);
+    QAbstractEventDispatcher::instance()->processEvents();
+
+    EXPECT_TRUE(r.timeoutCalled);
+}

@@ -15,7 +15,10 @@ public:
 
     virtual bool event(QEvent* event);
 
-    static void connect(QSignal<>& signal, QSignal<>::SlotType slot);
+    template<typename... Args>
+    static void connect(QSignal<Args...>& signal, typename QSignal<Args...>::SlotType slot) {
+        signal.connect(std::move(slot));
+    }
 
     template <typename Sender, typename Signal, typename Receiver, typename Slot>
     static void connect(Sender* sender, Signal signal, Receiver* receiver, Slot slot) {
