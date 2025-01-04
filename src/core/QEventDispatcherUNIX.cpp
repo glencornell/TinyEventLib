@@ -36,6 +36,17 @@ void QEventDispatcherUNIX::unregisterSocketNotifier(int fd) {
     m_socketNotifiers.erase(fd);
 }
 
+void QEventDispatcherUNIX::registerDeferredDelete(QObject* obj) {
+    m_deferredDeleteObjects.push_back(obj);
+}
+
+void QEventDispatcherUNIX::processDeferredDeletes() {
+    for (QObject* obj : m_deferredDeleteObjects) {
+        delete obj;
+    }
+    m_deferredDeleteObjects.clear();
+}
+
 void QEventDispatcherUNIX::processEvents() {
     // Handle timers
     const auto now = std::chrono::steady_clock::now();

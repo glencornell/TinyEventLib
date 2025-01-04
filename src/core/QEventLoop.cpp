@@ -26,6 +26,7 @@ bool QEventLoop::isRunning() const {
 
 void QEventLoop::processEvents() {
     QAbstractEventDispatcher::instance()->processEvents();
+    QAbstractEventDispatcher::instance()->processDeferredDeletes();
 }
 
 void QEventLoop::quit() {

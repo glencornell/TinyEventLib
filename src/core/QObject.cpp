@@ -1,4 +1,5 @@
 #include "QObject.hpp"
+#include "QAbstractEventDispatcher.hpp"
 #include <algorithm>
 
 // Global container of top-level QObject pointers
@@ -68,4 +69,8 @@ void QObject::removeEventFilter(QObject* filter) {
 
 bool QObject::eventFilter(QObject *watched, QEvent* event) {
     return false;
+}
+
+void QObject::deleteLater() {
+    QAbstractEventDispatcher::instance()->registerDeferredDelete(this);
 }

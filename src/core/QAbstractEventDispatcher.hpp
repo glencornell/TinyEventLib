@@ -22,6 +22,9 @@ public:
 
     virtual void postEvent(QObject *receiver, QEvent* event) = 0;
     virtual void processEvents() = 0;
+
+    virtual void registerDeferredDelete(QObject* obj) = 0;
+    virtual void processDeferredDeletes() = 0;
 private:
     static QAbstractEventDispatcher* m_instance;
 };

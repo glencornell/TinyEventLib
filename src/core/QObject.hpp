@@ -51,6 +51,15 @@ public:
         return m_eventFilters;
     }
 
+    /**
+     * @brief Schedule the object for deletion.
+     *
+     * Schedule the object for deletion after all pending events for the object have been processed.  This is useful for
+     * safely deleting objects in asynchronous environments without immediately invalidating pointers or other
+     * references.
+     */
+    void deleteLater();
+
 protected:
     void addChild(QObject* child);
     void removeChild(QObject* child);

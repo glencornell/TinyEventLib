@@ -20,6 +20,9 @@ public:
 
     void processEvents() override;
 
+    void registerDeferredDelete(QObject* obj) override;
+    void processDeferredDeletes() override;
+
 private:
     void postEvent(QObject *receiver, QEvent* event) override { };
 
@@ -27,4 +30,5 @@ private:
     std::map<int, QSocketNotifier*> m_socketNotifiers;
     std::vector<struct pollfd> m_pollfds;
     std::unordered_map<int, QSocketNotifier*> m_notifierCache;
+    std::vector<QObject *> m_deferredDeleteObjects;
 };
