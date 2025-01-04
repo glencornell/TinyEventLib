@@ -21,28 +21,42 @@ public:
     bool isSingleShot() const;
     void updateNextTrigger();
 
-    static void singleShot(uint32_t msec, const QSignal<>::SlotType& slot) {
-        // TODO: this creates a memory leak. Create a deferred deletion object queue in EventDispatcherUNIX
-        QTimer *timer = new QTimer;
-        connect(timer, &QTimer::timeout, slot);
+    // QTimer::singleShot implementation using QObject::connect
+    template <typename SignalType, typename Callable>
+    static void singleShot(uint32_t msec, QObject* receiver, Callable&& slot) {
+        auto timer = new QTimer;
+        QObject::connect(timer, &QTimer::timeout, receiver, std::forward<Callable>(slot));
+        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
         timer->startSingleShot(msec);
     }
 
-    template <typename Receiver, typename Slot>
-    static void singleShot(uint32_t msec, Receiver* receiver, Slot slot) {
-        // TODO: this creates a memory leak. Create a deferred deletion object queue in EventDispatcherUNIX
-        QTimer *timer = new QTimer;
-        connect(timer, &QTimer::timeout, receiver, slot);
+    // Overload for free functions
+    static void singleShot(uint32_t msec, void (*function)()) {
+        auto timer = new QTimer;
+        QObject::connect(timer, &QTimer::timeout, function);
+        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
         timer->startSingleShot(msec);
     }
 
-    template <typename Func>
-    static void singleShot(uint32_t msec, Func func) {
-        // TODO: this creates a memory leak. Create a deferred deletion object queue in EventDispatcherUNIX
-        QTimer *timer = new QTimer;
-        connect(timer, &QTimer::timeout, func);
+#if 0
+    // Overload for non-const member functions
+    template <typename C>
+    static void singleShot(uint32_t msec, C& instance, void (C::*method)()) {
+        auto timer = new QTimer;
+        QObject::connect(timer, &QTimer::timeout, instance, method);
+        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
         timer->startSingleShot(msec);
     }
+
+    // Overload for const member functions
+    template <typename C>
+    static void singleShot(uint32_t msec, const C& instance, void (C::*method)() const) {
+        auto timer = new QTimer;
+        QObject::connect(timer, &QTimer::timeout, instance, method);
+        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        timer->startSingleShot(msec);
+    }
+#endif
 
     QSignal<> timeout;
 

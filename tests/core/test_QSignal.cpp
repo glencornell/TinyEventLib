@@ -83,13 +83,18 @@ TEST_F(QSignalTest, DisconnectSlot) {
 
 TEST_F(QSignalTest, DisconnectNonexistentSlot) {
     QSignal<int> signal;
+    Receiver receiver;
     int result = 0;
     auto slot1 = [&result](int value) { result = value; };
     auto slot2 = [](int value) { (void)value; };
 
     signal.connect(slot1);
+    signal.connect([&receiver](int value) {
+        receiver.slot(value);
+    });
     signal.disconnect(slot2); // Disconnect a slot that was not connected
     signal(42);
 
     EXPECT_EQ(result, 42);
+    EXPECT_EQ(receiver.receivedValue, 42);
 }

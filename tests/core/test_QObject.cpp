@@ -81,7 +81,7 @@ TEST_F(QObjectTest, SignalSlotConnection) {
     bool slotCalled = false;
 
     auto slot = [&]() { slotCalled = true; };
-    QObject::connect(signal, slot);
+    signal.connect(slot);
 
     signal();
     EXPECT_TRUE(slotCalled);
