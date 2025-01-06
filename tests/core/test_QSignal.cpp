@@ -11,8 +11,8 @@ public:
     int receivedValue = 0;
 };
 
-void freeFunctionSlot(int value, int& receivedValue) {
-    receivedValue = value;
+void freeFunction(int x, int& out) {
+    out = x;
 }
 
 class QSignalTest : public ::testing::Test {};
@@ -32,25 +32,25 @@ TEST_F(QSignalTest, LambdaFunctionSlot) {
 }
 
 TEST_F(QSignalTest, FreeFunctionSlot) {
-    QSignal<int> signal;
-    int receivedValue = 0;
+    QSignal<int, int&> signal;
+    int output = 0;
 
-    connect(signal, [&receivedValue](int value) { freeFunctionSlot(value, receivedValue); });
+    connect(signal, freeFunction);
 
-    signal(24);
-    EXPECT_EQ(receivedValue, 24);
+    signal(24, output);
+    EXPECT_EQ(output, 24);
 }
 
 TEST_F(QSignalTest, MemberFunctionSlot) {
     QSignal<int> signal;
-    Receiver receiver;
+    Receiver receiver1;
+    Receiver receiver2;
 
-    signal.connect([&receiver](int value) {
-        receiver.slot(value);
-    });
-
+    signal.connect(receiver1, &Receiver::slot);
+    connect(signal, receiver2, &Receiver::slot);
     signal(15);
-    EXPECT_EQ(receiver.receivedValue, 15);
+    EXPECT_EQ(receiver1.receivedValue, 15);
+    EXPECT_EQ(receiver2.receivedValue, 15);
 }
 
 TEST_F(QSignalTest, MultipleSlots) {
@@ -64,6 +64,28 @@ TEST_F(QSignalTest, MultipleSlots) {
     signal(55);
     EXPECT_EQ(receivedValue1, 55);
     EXPECT_EQ(receivedValue2, 55);
+}
+
+class MyObject {
+public:
+    QSignal<int> valueChanged;
+    int m_value = 0;
+
+    void setValue(int value) {
+        m_value = value;
+        valueChanged(value);
+    }
+};
+
+TEST_F(QSignalTest, ChainedSlots) {
+    MyObject obj1, obj2, obj3;
+    connect(obj1.valueChanged, obj2, &MyObject::setValue);
+    connect(obj2.valueChanged, obj3, &MyObject::setValue);
+
+    obj1.setValue(10);
+    EXPECT_EQ(obj1.m_value, 10);
+    EXPECT_EQ(obj2.m_value, 10);
+    EXPECT_EQ(obj3.m_value, 10);
 }
 
 TEST_F(QSignalTest, DisconnectSlot) {

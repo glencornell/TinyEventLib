@@ -25,26 +25,26 @@ public:
     template <typename SignalType, typename Callable>
     static void singleShot(uint32_t msec, QObject* receiver, Callable&& slot) {
         auto timer = new QTimer;
-        QObject::connect(timer, &QTimer::timeout, receiver, std::forward<Callable>(slot));
-        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
-        timer->startSingleShot(msec);
-    }
-
-    // Overload for free functions
-    static void singleShot(uint32_t msec, void (*function)()) {
-        auto timer = new QTimer;
-        QObject::connect(timer, &QTimer::timeout, function);
+        QObject::connect(timer, &QTimer::timeout, *receiver, std::forward<Callable>(slot));
         //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
         timer->startSingleShot(msec);
     }
 
 #if 0
+    // Overload for free functions
+    static void singleShot(uint32_t msec, void (*function)()) {
+        auto timer = new QTimer;
+        QObject::connect(timer, &QTimer::timeout, function);
+        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        timer->startSingleShot(msec);
+    }
+
     // Overload for non-const member functions
     template <typename C>
     static void singleShot(uint32_t msec, C& instance, void (C::*method)()) {
         auto timer = new QTimer;
         QObject::connect(timer, &QTimer::timeout, instance, method);
-        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
         timer->startSingleShot(msec);
     }
 
@@ -53,7 +53,7 @@ public:
     static void singleShot(uint32_t msec, const C& instance, void (C::*method)() const) {
         auto timer = new QTimer;
         QObject::connect(timer, &QTimer::timeout, instance, method);
-        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
         timer->startSingleShot(msec);
     }
 #endif

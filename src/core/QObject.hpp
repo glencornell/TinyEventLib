@@ -15,23 +15,6 @@ public:
 
     virtual bool event(QEvent* event);
 
-    template<typename... Args>
-    static void connect(QSignal<Args...>& signal, typename QSignal<Args...>::SlotType slot) {
-        signal.connect(std::move(slot));
-    }
-
-    template <typename Sender, typename Signal, typename Receiver, typename Slot>
-    static void connect(Sender* sender, Signal signal, Receiver* receiver, Slot slot) {
-        (sender->*signal).connect([receiver, slot](auto&&... args) {
-            (receiver->*slot)(std::forward<decltype(args)>(args)...);
-        });
-    }
-
-    template <typename Sender, typename Signal, typename Func>
-    static void connect(Sender* sender, Signal signal, Func func) {
-        (sender->*signal).connect(func);
-    }
-
     void installEventFilter(QObject* filter);
     void removeEventFilter(QObject* filter);
 
@@ -59,6 +42,26 @@ public:
      * references.
      */
     void deleteLater();
+
+    template <typename... Args>
+    static void connect(const QSignal<void(Args...)>& signal, void(*slot)(Args...)) {
+        return signal.connect(slot);
+    }
+
+    template <typename... Args, typename Callable>
+    static void connect(const QSignal<void(Args...)>& signal, Callable&& callable) {
+        return signal.connect(std::forward<Callable>(callable));
+    }
+
+    template <typename... Args, typename T>
+    static void connect(const QSignal<void(Args...)>& signal, const T* instance, void(T::*method)(Args...)) {
+        return signal.connect(instance, method);
+    }
+
+    template <typename... Args, typename T>
+    static void connect(const QSignal<void(Args...)>& signal, const T* instance, void(T::*method)(Args...) const) {
+        return signal.connect(instance, method);
+    }
 
 protected:
     void addChild(QObject* child);

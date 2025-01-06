@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     timer1.start(1000); // 1 second
 
     QTimer timer2;
-    QObject::connect(&timer2, &QTimer::timeout, []() {
+    connect(timer2.timeout, []() {
         std::cout << "Timer 2 expired!" << std::endl;
     });
     timer2.start(2000); // 2 seconds

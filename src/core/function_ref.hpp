@@ -70,7 +70,16 @@ public:
         return callback(object, std::forward<Args>(args)...);
     }
 
-    const void* target() const noexcept {
-        return object;
+    auto constexpr target() const noexcept {
+        return std::pair<void *, callback_type> {object, callback};
+    }
+
+    bool constexpr operator==(const function_ref& other) const noexcept {
+        return object == other.object &&
+               callback == other.callback;
+    }
+
+    bool constexpr operator!=(const function_ref& other) const noexcept {
+        return !(*this == other);
     }
 };

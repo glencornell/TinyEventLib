@@ -46,12 +46,10 @@ TEST_F(FunctionRefTest, Functor) {
     EXPECT_EQ(output, 20); // Functor multiplies by 2
 }
 
-#if 0
-
 // Test non-const member function
 TEST_F(FunctionRefTest, NonConstMemberFunction) {
     MyClass obj;
-    function_ref<void(int, int&)> ref(obj, &MyClass::non_const_member);
+    function_ref<void(int, int&)> ref = [&obj](int x, int& y) -> void { obj.non_const_member(x, y); };
     ref(10, output);
     EXPECT_EQ(output, 9); // Non-const member subtracts 1
 }
@@ -59,13 +57,13 @@ TEST_F(FunctionRefTest, NonConstMemberFunction) {
 // Test const member function
 TEST_F(FunctionRefTest, ConstMemberFunction) {
     const MyClass obj;
-    function_ref<void(int, int&)> ref(obj, &MyClass::const_member);
+    function_ref<void(int, int&)> ref = [&obj](int x, int& y) -> void { obj.const_member(x, y); };
     ref(10, output);
     EXPECT_EQ(output, 100); // Const member squares the input
 }
 
 // Test comparison of function_ref objects
-TEST(FunctionRefComparisonTest, Comparison) {
+TEST_F(FunctionRefTest, Comparison) {
     function_ref<void(int, int&)> ref1(free_function);
     function_ref<void(int, int&)> ref2(free_function);
     EXPECT_EQ(ref1, ref2); // Both refer to the same free function
@@ -75,10 +73,8 @@ TEST(FunctionRefComparisonTest, Comparison) {
     EXPECT_NE(ref1, ref3); // Different callable objects
 }
 
-#endif
-
 // Test target method
-TEST(FunctionRefTargetTest, TargetMethod) {
+TEST_F(FunctionRefTest, TargetMethod) {
     function_ref<void(int, int&)> ref1(free_function);
     function_ref<void(int, int&)> ref2(free_function);
     EXPECT_EQ(ref1.target(), ref2.target()); // Same target for the same free function
@@ -89,7 +85,7 @@ TEST(FunctionRefTargetTest, TargetMethod) {
 }
 
 // Test invalid callable handling
-TEST(FunctionRefEdgeCaseTest, NullCallable) {
+TEST_F(FunctionRefTest, NullCallable) {
     function_ref<void(int, int&)>* ref = nullptr;
     EXPECT_EQ(ref, nullptr); // Verify the function_ref can handle null properly
 }

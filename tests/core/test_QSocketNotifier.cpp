@@ -15,7 +15,7 @@ protected:
 
         socketNotifier = new QSocketNotifier(pipefd[0], QSocketNotifier::Read);
 
-        QObject::connect(socketNotifier, &QSocketNotifier::activated, [this]() {
+        socketNotifier->activated.connect([this]() {
             char buffer[1];
             read(pipefd[0], buffer, 1);
             dataReceived = true;
