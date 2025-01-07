@@ -8,7 +8,36 @@ public:
         receivedValue = value;
     }
 
+    void constSlot(int value, int &rval) const {
+        rval = value;
+    }
+
+    virtual void virtualSlot(int value) {
+        receivedValue = value;
+        baseVirtualSlotCalled = true;
+    }
+
+    virtual void virtualConstSlot(int value, int &rval) const {
+        rval = value;
+    }
+
     int receivedValue = 0;
+    bool baseVirtualSlotCalled = false;
+};
+
+class DerivedReceiver : public Receiver {
+public:
+    void virtualSlot(int value) override {
+        receivedValue = value;
+        derivedVirtualSlotCalled = true;
+    }
+
+    void virtualConstSlot(int value, int &rval) const override {
+        rval = value + 1;
+    }
+
+    int receivedValue = 0;
+    bool derivedVirtualSlotCalled = false;
 };
 
 void freeFunction(int x, int& out) {
@@ -41,18 +70,6 @@ TEST_F(QSignalTest, FreeFunctionSlot) {
     EXPECT_EQ(output, 24);
 }
 
-TEST_F(QSignalTest, MemberFunctionSlot) {
-    QSignal<int> signal;
-    Receiver receiver1;
-    Receiver receiver2;
-
-    signal.connect(receiver1, &Receiver::slot);
-    connect(signal, receiver2, &Receiver::slot);
-    signal(15);
-    EXPECT_EQ(receiver1.receivedValue, 15);
-    EXPECT_EQ(receiver2.receivedValue, 15);
-}
-
 TEST_F(QSignalTest, MultipleSlots) {
     QSignal<int> signal;
     int receivedValue1 = 0;
@@ -79,8 +96,8 @@ public:
 
 TEST_F(QSignalTest, ChainedSlots) {
     MyObject obj1, obj2, obj3;
-    connect(obj1.valueChanged, obj2, &MyObject::setValue);
-    connect(obj2.valueChanged, obj3, &MyObject::setValue);
+    connect(obj1.valueChanged, [&obj2](int value) { obj2.setValue(value); });
+    connect(obj2.valueChanged, [&obj3](int value) { obj3.setValue(value); });
 
     obj1.setValue(10);
     EXPECT_EQ(obj1.m_value, 10);
@@ -96,8 +113,8 @@ TEST_F(QSignalTest, DisconnectSlot) {
         receivedValue = value;
     };
 
-    signal.connect(lambda);
-    signal.disconnect(lambda);
+    auto id = signal.connect(lambda);
+    signal.disconnect(id);
 
     signal(99);
     EXPECT_EQ(receivedValue, 0);
@@ -114,7 +131,7 @@ TEST_F(QSignalTest, DisconnectNonexistentSlot) {
     signal.connect([&receiver](int value) {
         receiver.slot(value);
     });
-    signal.disconnect(slot2); // Disconnect a slot that was not connected
+    signal.disconnect(100); // Disconnect a slot that was not connected
     signal(42);
 
     EXPECT_EQ(result, 42);

@@ -86,7 +86,7 @@ TEST_F(QTimerTest, TimeoutSignal) {
 
 TEST_F(QTimerTest, TimeoutSingleShot) {
     bool timeoutCalled = false;
-    timer->timeout.connect([&]() {
+    timer->timeout.connect([&timeoutCalled]() {
         timeoutCalled = true;
     });
 
@@ -97,8 +97,6 @@ TEST_F(QTimerTest, TimeoutSingleShot) {
 
     EXPECT_TRUE(timeoutCalled);
 }
-
-#if 0
 
 class Receiver : public QObject {
 public:
@@ -111,11 +109,11 @@ public:
 TEST_F(QTimerTest, SingleShotFunction) {
     Receiver r;
     uint32_t interval = 10;
-    QTimer::singleShot(interval, &r, &Receiver::onTimerExpired);
+    QTimer::singleShot(interval, [&r](){
+        r.onTimerExpired();
+    });
     std::this_thread::sleep_for(std::chrono::milliseconds(interval + 50));
     QAbstractEventDispatcher::instance()->processEvents();
 
     EXPECT_TRUE(r.timeoutCalled);
 }
-
-#endif

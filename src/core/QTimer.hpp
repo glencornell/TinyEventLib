@@ -22,41 +22,21 @@ public:
     void updateNextTrigger();
 
     // QTimer::singleShot implementation using QObject::connect
-    template <typename SignalType, typename Callable>
-    static void singleShot(uint32_t msec, QObject* receiver, Callable&& slot) {
+    template <typename Functor>
+    static void singleShot(uint32_t msec, Functor&& slot) {
         auto timer = new QTimer;
-        QObject::connect(timer, &QTimer::timeout, *receiver, std::forward<Callable>(slot));
-        //QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        timer->timeout.connect(std::forward<Functor>(slot));
+        timer->timeout.connect([&timer]() { timer->deleteLater(); });
         timer->startSingleShot(msec);
     }
 
-#if 0
     // Overload for free functions
     static void singleShot(uint32_t msec, void (*function)()) {
         auto timer = new QTimer;
-        QObject::connect(timer, &QTimer::timeout, function);
-        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+        timer->timeout.connect(function);
+        timer->timeout.connect([&timer]() { timer->deleteLater(); });
         timer->startSingleShot(msec);
     }
-
-    // Overload for non-const member functions
-    template <typename C>
-    static void singleShot(uint32_t msec, C& instance, void (C::*method)()) {
-        auto timer = new QTimer;
-        QObject::connect(timer, &QTimer::timeout, instance, method);
-        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
-        timer->startSingleShot(msec);
-    }
-
-    // Overload for const member functions
-    template <typename C>
-    static void singleShot(uint32_t msec, const C& instance, void (C::*method)() const) {
-        auto timer = new QTimer;
-        QObject::connect(timer, &QTimer::timeout, instance, method);
-        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
-        timer->startSingleShot(msec);
-    }
-#endif
 
     QSignal<> timeout;
 

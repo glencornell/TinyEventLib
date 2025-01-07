@@ -43,26 +43,6 @@ public:
      */
     void deleteLater();
 
-    template <typename... Args>
-    static void connect(const QSignal<void(Args...)>& signal, void(*slot)(Args...)) {
-        return signal.connect(slot);
-    }
-
-    template <typename... Args, typename Callable>
-    static void connect(const QSignal<void(Args...)>& signal, Callable&& callable) {
-        return signal.connect(std::forward<Callable>(callable));
-    }
-
-    template <typename... Args, typename T>
-    static void connect(const QSignal<void(Args...)>& signal, const T* instance, void(T::*method)(Args...)) {
-        return signal.connect(instance, method);
-    }
-
-    template <typename... Args, typename T>
-    static void connect(const QSignal<void(Args...)>& signal, const T* instance, void(T::*method)(Args...) const) {
-        return signal.connect(instance, method);
-    }
-
 protected:
     void addChild(QObject* child);
     void removeChild(QObject* child);
