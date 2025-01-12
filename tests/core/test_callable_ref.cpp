@@ -84,22 +84,37 @@ protected:
     int output = 0;
 };
 
-#if 0
-// Test comparison of callable_ref objects
-TEST_F(CallableRefTest, Comparison) {
+TEST_F(CallableRefTest, Comparison1) {
     MyClass1 obj1;
     auto ref1 = callable_ref<void(const std::string&)>(&obj1, &MyClass1::printMessage);
     auto ref2 = callable_ref<void(const std::string&)>(&obj1, &MyClass1::printMessage);
-    EXPECT_EQ(ref1, ref2); // Both refer to the same method
+    EXPECT_EQ(ref1, ref2);
+}
 
-    auto ref3 = ref1;
-    EXPECT_EQ(ref1, ref3); // Both refer to the same method
-
-    MyClass1 obj2;;
-    auto ref4 = callable_ref<void(const std::string&)>(&obj2, &MyClass1::printMessage);
-    EXPECT_NE(ref1, ref4); // Different callable objects
+#if 0
+TEST_F(CallableRefTest, Comparison2) {
+    MyClass1 obj1;
+    auto ref1 = callable_ref<void(const std::string&)>(&obj1, &MyClass1::printMessage);
+    auto ref2 = ref1;
+    EXPECT_EQ(ref1, ref2);
 }
 #endif
+
+TEST_F(CallableRefTest, Comparison3) {
+    MyClass1 obj1;
+    MyClass1 obj2;
+    auto ref1 = callable_ref<void(const std::string&)>(&obj1, &MyClass1::printMessage);
+    auto ref2 = callable_ref<void(const std::string&)>(&obj2, &MyClass1::printMessage);
+    EXPECT_NE(ref1, ref2);
+}
+
+TEST_F(CallableRefTest, Comparison4) {
+    MyClass1 obj1;
+    auto lambda = [](const std::string& str) { std::cout << str <<std::endl; };
+    auto ref1 = callable_ref<void(const std::string&)>(&obj1, &MyClass1::printMessage);
+    auto ref2 = callable_ref<void(const std::string&)>(lambda);
+    EXPECT_NE(ref1, ref2);
+}
 
 TEST_F(CallableRefTest, NullCallable) {
     callable_ref<void(int, int&)>* ref = nullptr;

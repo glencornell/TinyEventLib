@@ -1,7 +1,4 @@
 add_executable(test_core
-  test_function_ref.cpp
-  test_method_ref.cpp
-  test_callable_ref.cpp
   test_QSignal.cpp
   test_QObject.cpp
   test_QEvent.cpp

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25)
 project(QtLite)
 
 # Define custom build types
@@ -22,11 +22,8 @@ add_custom_target(check
 
 # Create global compiler and linker options
 set(GLOBAL_COVERAGE_COMPILE_OPTIONS -O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -g)
-
-# Add the coverage target
 include(cmake/coverage.cmake)
 
-add_subdirectory(third-party)
 add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(tests)

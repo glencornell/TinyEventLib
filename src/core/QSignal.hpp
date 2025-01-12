@@ -3,13 +3,11 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
-#include "callable_ref.hpp"
 
 template<typename... Args>
 class QSignal {
 public:
-    //using slot_t = std::function<void(Args...)>;
-    using slot_t = callable_ref<void(Args...)>;
+    using slot_t = std::function<void(Args...)>;
     using id_t = std::size_t;
 
     id_t connect(slot_t slot) {
