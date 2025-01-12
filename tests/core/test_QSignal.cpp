@@ -54,7 +54,7 @@ TEST_F(QSignalTest, LambdaFunctionSlot) {
         receivedValue = value;
     };
 
-    connect(signal, lambda);
+    signal.connect(lambda);
 
     signal(42);
     EXPECT_EQ(receivedValue, 42);

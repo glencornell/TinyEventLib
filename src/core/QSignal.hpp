@@ -3,11 +3,13 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
+#include "callable_ref.hpp"
 
 template<typename... Args>
 class QSignal {
 public:
-    using slot_t = std::function<void(Args...)>;
+    //using slot_t = std::function<void(Args...)>;
+    using slot_t = callable_ref<void(Args...)>;
     using id_t = std::size_t;
 
     id_t connect(slot_t slot) {
@@ -23,6 +25,16 @@ public:
     template <typename Functor>
     auto connect(Functor&& functor) {
         return connect(slot_t(std::forward<Functor>(functor))); // Assumes functor outlives the signal
+    }
+
+    template <typename Class>
+    auto connect(Class* instance, void (Class::*method)(Args...)) {
+        return connect(slot_t(instance, method));
+    }
+
+    template <typename Class>
+    auto connect(const Class* instance, void (Class::*method)(Args...) const) {
+        return connect(slot_t(instance, method));
     }
 
     void disconnect(id_t id) {
