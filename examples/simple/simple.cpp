@@ -42,6 +42,13 @@ int main(int argc, char* argv[]) {
     });
     singleShotTimer.startSingleShot(3000); // 3 seconds
 
+    // And quit after ten seconds
+    QTimer quitAfter;
+    connect(quitAfter.timeout, [&app]() {
+        app.quit();
+    });
+    quitAfter.startSingleShot(10000); // 10 seconds
+
     app.exec();
 
     return 0;
