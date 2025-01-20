@@ -5,6 +5,7 @@ add_executable(test_core
   test_QTimer.cpp
   test_QSocketNotifier.cpp
   test_QCoreApplication.cpp
+  test_QPosixSignal.cpp
 )
 target_link_libraries(test_core PUBLIC QtCoreLite gtest_main gtest)
 

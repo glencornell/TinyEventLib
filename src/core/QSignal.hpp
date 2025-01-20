@@ -25,14 +25,29 @@ public:
         return connect(slot_t(std::forward<Functor>(functor))); // Assumes functor outlives the signal
     }
 
-    template <typename Class>
-    auto connect(Class* instance, void (Class::*method)(Args...)) {
-        return connect(slot_t(instance, method));
+    template <typename Class, typename Method>
+    auto connect(Class* instance, Method method) {
+        return connect([instance, method](Args... args) {
+            (instance->*method)(std::forward<Args>(args)...);
+        });
     }
 
-    template <typename Class>
-    auto connect(const Class* instance, void (Class::*method)(Args...) const) {
-        return connect(slot_t(instance, method));
+    static auto connect(QSignal& signal, slot_t slot) {
+        return signal.connect(std::move(slot));
+    }
+
+    static auto connect(QSignal& signal, void (*function)(Args...)) {
+        return signal.connect(function);
+    }
+
+    template <typename Functor>
+    static auto connect(QSignal& signal, Functor&& functor) {
+        return signal.connect(functor);
+    }
+
+    template <typename Class, typename Method>
+    static auto connect(QSignal& signal, Class* instance, Method method) {
+        return signal.connect(instance, method);
     }
 
     void disconnect(id_t id) {
@@ -58,19 +73,3 @@ private:
     std::vector<Slot> m_slots;
     id_t m_nextId{0};
 };
-
-// Convenience functions
-template<typename... Args>
-inline auto connect(QSignal<Args...>& signal, typename QSignal<Args...>::slot_t slot) {
-    return signal.connect(std::move(slot));
-}
-
-template<typename... Args>
-inline auto connect(QSignal<Args...>& signal, void (*function)(Args...)) {
-    return signal.connect(function);
-}
-
-template <typename Functor, typename... Args>
-inline auto connect(QSignal<Args...>& signal, Functor&& functor) {
-    return signal.connect(functor);
-}

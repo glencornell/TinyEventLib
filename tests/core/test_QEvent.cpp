@@ -35,7 +35,7 @@ TEST_F(QEventTest, ProcessEvents) {
 
     app.postEvent(&receiver, new QEvent("QEvent::User"));
 
-    connect(timer.timeout, [&receiver, this]() {
+    timer.timeout.connect([&receiver, this]() {
         app.quit();
     });
     timer.start(100);
@@ -49,7 +49,7 @@ TEST_F(QEventTest, SendEvent) {
     EventReceiver receiver;
     QTimer timer;
 
-    connect(timer.timeout, [&receiver, this]() {
+    timer.timeout.connect([&receiver, this]() {
         QEvent ev("QEvent::User");
         app.sendEvent(&receiver, &ev);
         app.quit();

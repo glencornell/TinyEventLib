@@ -10,7 +10,10 @@ set(SOURCES
 if(WIN32)
   list(APPEND SOURCES windows_specific.cpp)
 elseif(UNIX AND NOT APPLE)
-  list(APPEND SOURCES QEventDispatcherUNIX.cpp)
+  list(APPEND SOURCES
+    QEventDispatcherUNIX.cpp
+    QPosixSignal.cpp
+  )
 elseif(APPLE)
   list(APPEND SOURCES mac_specific.cpp)
 endif()

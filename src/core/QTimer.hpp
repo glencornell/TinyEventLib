@@ -21,7 +21,6 @@ public:
     bool isSingleShot() const;
     void updateNextTrigger();
 
-    // QTimer::singleShot implementation using QObject::connect
     template <typename Functor>
     static void singleShot(uint32_t msec, Functor&& slot) {
         auto timer = new QTimer;
@@ -30,10 +29,17 @@ public:
         timer->startSingleShot(msec);
     }
 
-    // Overload for free functions
     static void singleShot(uint32_t msec, void (*function)()) {
         auto timer = new QTimer;
         timer->timeout.connect(function);
+        timer->timeout.connect([&timer]() { timer->deleteLater(); });
+        timer->startSingleShot(msec);
+    }
+
+    template <typename Class, typename Method>
+    static void singleShot(uint32_t msec, Class* instance, Method method) {
+        auto timer = new QTimer;
+        timer->timeout.connect(instance, method);
         timer->timeout.connect([&timer]() { timer->deleteLater(); });
         timer->startSingleShot(msec);
     }
