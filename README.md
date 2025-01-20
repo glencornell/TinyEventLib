@@ -8,6 +8,4 @@ Don't use this. Use Qt or CopperSpice instead. It's not thread safe and is missi
 I would like to port this to Arduino as a fun exercise.
 
 # TODO:
-- [ ] Refactor to run in memory-constrained environments (i.e. Arduino).
-- [ ] Add signal handling, perhaps with signalfd on Linux.
-- [ ] Consider refactoring implementation of QTimer with timerfd on Linux.
+- [ ] Implement QSignal using function_ref & add suppoprt for capturing class instance and method pointers.
