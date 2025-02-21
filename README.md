@@ -9,3 +9,4 @@ I would like to port this to Arduino as a fun exercise.
 
 # TODO:
 - [ ] Implement QSignal using function_ref & add suppoprt for capturing class instance and method pointers.
+- [ ] Support signals/slots across multiple threads.
